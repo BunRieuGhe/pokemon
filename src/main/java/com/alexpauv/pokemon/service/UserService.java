@@ -4,6 +4,9 @@ import com.alexpauv.pokemon.dto.LoginDto;
 import com.alexpauv.pokemon.dto.LoginRequest;
 import com.alexpauv.pokemon.dto.RegisterDto;
 import com.alexpauv.pokemon.dto.RegisterRequest;
+import com.alexpauv.pokemon.exception.AuthenticationFailedException;
+import com.alexpauv.pokemon.exception.EmailAlreadyExistsException;
+import com.alexpauv.pokemon.exception.UsernameAlreadyExistsException;
 import com.alexpauv.pokemon.model.User;
 import com.alexpauv.pokemon.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,10 +32,10 @@ public class UserService {
 
     public RegisterDto registerUser(RegisterRequest registerRequest) {
         if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists"); // TODO: make custom exception
+            throw new UsernameAlreadyExistsException("Username already exists");
         }
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already exists"); // TODO: make custom exception
+            throw new EmailAlreadyExistsException("Email already exists");
         }
 
         User user = new User();
@@ -55,8 +58,7 @@ public class UserService {
                 return new LoginDto(user.getUsername(), token);
             }
         } catch (AuthenticationException e) {
-            System.out.println("Authentication failed for user: " + loginRequest.getUsername());
-            System.out.println(e.getMessage());
+            throw new AuthenticationFailedException("Authentication failed");
         }
         return new LoginDto();
     }
