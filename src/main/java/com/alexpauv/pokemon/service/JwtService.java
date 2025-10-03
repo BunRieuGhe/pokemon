@@ -1,44 +1,66 @@
 package com.alexpauv.pokemon.service;
 
-import com.alexpauv.pokemon.dto.LoginRequest;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import com.alexpauv.pokemon.config.RsaKeyProperties;
+import com.alexpauv.pokemon.model.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.function.Function;
 
 @Service
 public class JwtService {
-    private final JwtEncoder jwtEncoder;
-    private final AuthenticationManager authenticationManager;
+    private static final long TOKEN_DURATION_IN_MILLISECONDS = 900000;
+    private final RsaKeyProperties rsaKeyProperties;
 
-    public JwtService(JwtEncoder jwtEncoder, AuthenticationManager authenticationManager) {
-        this.jwtEncoder = jwtEncoder;
-        this.authenticationManager = authenticationManager;
+    public JwtService(RsaKeyProperties rsaKeyProperties) {
+        this.rsaKeyProperties = rsaKeyProperties;
     }
 
-    public String generateToken(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-        );
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(rsaKeyProperties.publicKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
 
-        Instant now = Instant.now();
-        String scope = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(" "));
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("self")
-                .issuedAt(now)
-                .expiresAt(now.plus(1, ChronoUnit.HOURS))
-                .subject(authentication.getName())
-                .claim("scope", scope)
-                .build();
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
 
-        return this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    private String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    private Date extractExpirationDate(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    public String generateToken(User user) {
+        return Jwts.builder()
+                .claims(new HashMap<String, Object>())
+                .subject(user.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + TOKEN_DURATION_IN_MILLISECONDS))
+                .signWith(rsaKeyProperties.privateKey(), Jwts.SIG.RS256)
+                .compact();
+    }
+
+    public boolean isTokenExpired(String token) {
+        return extractExpirationDate(token).before(new Date());
+    }
+
+    public String getUsernameFromToken(String token) {
+        return extractUsername(token);
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = getUsernameFromToken(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 }

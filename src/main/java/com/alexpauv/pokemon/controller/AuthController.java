@@ -2,8 +2,8 @@ package com.alexpauv.pokemon.controller;
 
 import com.alexpauv.pokemon.dto.LoginDto;
 import com.alexpauv.pokemon.dto.LoginRequest;
+import com.alexpauv.pokemon.dto.RegisterDto;
 import com.alexpauv.pokemon.dto.RegisterRequest;
-import com.alexpauv.pokemon.service.JwtService;
 import com.alexpauv.pokemon.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,23 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final UserService userService;
-    private final JwtService jwtService;
 
-    public AuthController(UserService userService, JwtService jwtService) {
+    public AuthController(UserService userService) {
         this.userService = userService;
-        this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
-        userService.createUser(registerRequest);
-
-        return ResponseEntity.ok("User registered successfully");
+    public ResponseEntity<RegisterDto> register(@RequestBody RegisterRequest registerRequest) {
+        return ResponseEntity.ok(userService.registerUser(registerRequest));
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginDto> login(@RequestBody LoginRequest loginRequest) {
-        String token = this.jwtService.generateToken(loginRequest);
-        return ResponseEntity.ok(new LoginDto(loginRequest.getUsername(), token));
+        return ResponseEntity.ok(userService.loginUser(loginRequest));
     }
 }

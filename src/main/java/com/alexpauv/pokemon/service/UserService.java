@@ -1,8 +1,15 @@
 package com.alexpauv.pokemon.service;
 
+import com.alexpauv.pokemon.dto.LoginDto;
+import com.alexpauv.pokemon.dto.LoginRequest;
+import com.alexpauv.pokemon.dto.RegisterDto;
 import com.alexpauv.pokemon.dto.RegisterRequest;
 import com.alexpauv.pokemon.model.User;
 import com.alexpauv.pokemon.repository.UserRepository;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -10,26 +17,48 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
-    public User createUser(RegisterRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+    public RegisterDto registerUser(RegisterRequest registerRequest) {
+        if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username already exists"); // TODO: make custom exception
         }
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists"); // TODO: make custom exception
         }
 
         User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setUsername(registerRequest.getUsername());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        String token = jwtService.generateToken(savedUser);
+
+        return new RegisterDto(savedUser, token);
+    }
+
+    public LoginDto loginUser(LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+            if (authentication.isAuthenticated()) {
+                User user = getUserByUsername(loginRequest.getUsername());
+                String token = jwtService.generateToken(user);
+                return new LoginDto(user.getUsername(), token);
+            }
+        } catch (AuthenticationException e) {
+            System.out.println("Authentication failed for user: " + loginRequest.getUsername());
+            System.out.println(e.getMessage());
+        }
+        return new LoginDto();
     }
 
     public User getUserByUsername(String username) {
