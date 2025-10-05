@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="003-create-role-authority-table" author="alexpauv">
+        <createTable schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="authority" type="text">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableSchemaName="pokemon"
+                baseTableName="role_authority"
+                baseColumnNames="role_id"
+                constraintName="fk_role_authority_role"
+                referencedTableSchemaName="pokemon"
+                referencedTableName="roles"
+                referencedColumnNames="id"
+                onDelete="CASCADE" />
+    </changeSet>
+</databaseChangeLog>

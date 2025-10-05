@@ -9,10 +9,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
 public class JwtService {
+    private static final String AUTHORITIES_STRING = "authorities";
     private static final long TOKEN_DURATION_IN_MILLISECONDS = 900000;
     private final RsaKeyProperties rsaKeyProperties;
 
@@ -37,13 +40,22 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    private List<String> extractAuthorities(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get(AUTHORITIES_STRING, List.class);
+    }
+
     private Date extractExpirationDate(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
     public String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        List<String> authorities = user.getAllAuthorities().stream().map(Enum::name).toList();
+        claims.put(AUTHORITIES_STRING, authorities);
+
         return Jwts.builder()
-                .claims(new HashMap<String, Object>())
+                .claims(claims)
                 .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + TOKEN_DURATION_IN_MILLISECONDS))
@@ -57,6 +69,10 @@ public class JwtService {
 
     public String getUsernameFromToken(String token) {
         return extractUsername(token);
+    }
+
+    public List<String> getAuthoritiesFromToken(String token) {
+        return extractAuthorities(token);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

@@ -2,10 +2,11 @@ package com.alexpauv.pokemon.config;
 
 import com.alexpauv.pokemon.model.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.stream.Collectors;
 
 public class CustomUserDetails implements UserDetails {
     private final User user;
@@ -16,7 +17,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        return user.getAllAuthorities().stream().map(authority -> new SimpleGrantedAuthority(authority.name())).collect(Collectors.toSet());
     }
 
     @Override

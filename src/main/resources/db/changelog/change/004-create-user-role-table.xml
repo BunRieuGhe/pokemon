@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="004-create-user-role-table" author="alexpauv">
+        <createTable schemaName="pokemon" tableName="user_role">
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+                schemaName="pokemon"
+                tableName="user_role"
+                columnNames="user_id, role_id"
+                constraintName="pk_user_role" />
+
+        <addForeignKeyConstraint
+                baseTableSchemaName="pokemon"
+                baseTableName="user_role"
+                baseColumnNames="user_id"
+                constraintName="fk_user_role_user"
+                referencedTableSchemaName="pokemon"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                onDelete="CASCADE" />
+
+        <addForeignKeyConstraint
+                baseTableSchemaName="pokemon"
+                baseTableName="user_role"
+                baseColumnNames="role_id"
+                constraintName="fk_user_role_role"
+                referencedTableSchemaName="pokemon"
+                referencedTableName="roles"
+                referencedColumnNames="id"
+                onDelete="CASCADE" />
+    </changeSet>
+</databaseChangeLog>
