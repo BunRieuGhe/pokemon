@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="006-create-default-roles" author="alexpauv">
+        <!-- Default ADMIN role -->
+        <insert schemaName="pokemon" tableName="roles">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="Admin"/>
+            <column name="uuid" valueComputed="gen_random_uuid()"/>
+        </insert>
+        <!-- Default USER role -->
+        <insert schemaName="pokemon" tableName="roles">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="User"/>
+            <column name="uuid" valueComputed="gen_random_uuid()"/>
+        </insert>
+        <!-- Default EDITOR role -->
+        <insert schemaName="pokemon" tableName="roles">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="Editor"/>
+            <column name="uuid" valueComputed="gen_random_uuid()"/>
+        </insert>
+
+        <!-- Default ADMIN authorities -->
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="CREATE_USER"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="READ_USER"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="UPDATE_USER"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="DELETE_USER"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="CREATE_ROLE"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="READ_ROLE"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="UPDATE_ROLE"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="DELETE_ROLE"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="CREATE_POKEMON"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="READ_POKEMON"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="UPDATE_POKEMON"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="authority" value="DELETE_POKEMON"/>
+        </insert>
+        <!-- Default USER authorities -->
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="2"/>
+            <column name="authority" value="READ_USER"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="2"/>
+            <column name="authority" value="READ_POKEMON"/>
+        </insert>
+        <!-- Default EDITOR authorities -->
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="3"/>
+            <column name="authority" value="READ_USER"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="3"/>
+            <column name="authority" value="CREATE_POKEMON"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="3"/>
+            <column name="authority" value="READ_POKEMON"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="3"/>
+            <column name="authority" value="UPDATE_POKEMON"/>
+        </insert>
+        <insert schemaName="pokemon" tableName="role_authority">
+            <column name="role_id" valueNumeric="3"/>
+            <column name="authority" value="DELETE_POKEMON"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

@@ -1,4 +1,4 @@
-package com.alexpauv.pokemon.model;
+package com.alexpauv.pokemon.model.role;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -17,6 +17,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "roles")
@@ -29,6 +30,9 @@ public class Role implements Serializable {
     @Column(name="id")
     private Long id;
 
+    @Column(unique = true, nullable = false, updatable = false)
+    private UUID uuid;
+
     @Column(nullable = false, unique = true)
     private String name;
 
@@ -38,9 +42,12 @@ public class Role implements Serializable {
     @Column(name = "authority")
     private Set<Authority> authorities = new HashSet<>();
 
-    public Role() {}
+    public Role() {
+        this.uuid = UUID.randomUUID();
+    }
 
     public Role(String name, Set<Authority> authorities) {
+        super();
         this.name = name;
         this.authorities = authorities;
     }
@@ -51,6 +58,14 @@ public class Role implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {

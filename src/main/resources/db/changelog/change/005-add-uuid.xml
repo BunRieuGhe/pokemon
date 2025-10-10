@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="005-add-uuid" author="alexpauv">
+        <addColumn schemaName="pokemon" tableName="users">
+            <column name="uuid" type="uuid" />
+            <column name="status" type="text" />
+        </addColumn>
+
+        <addColumn schemaName="pokemon" tableName="roles">
+            <column name="uuid" type="uuid" />
+        </addColumn>
+
+        <sql dbms="postgresql">
+            UPDATE pokemon.users SET uuid = gen_random_uuid() WHERE uuid IS NULL;
+            UPDATE pokemon.roles SET uuid = gen_random_uuid() WHERE uuid IS NULL;
+        </sql>
+
+        <addNotNullConstraint schemaName="pokemon" tableName="users" columnName="uuid" columnDataType="uuid"/>
+        <addUniqueConstraint schemaName="pokemon" tableName="users" columnNames="uuid" constraintName="uk_users_uuid"/>
+        <addNotNullConstraint schemaName="pokemon" tableName="roles" columnName="uuid" columnDataType="uuid"/>
+        <addUniqueConstraint schemaName="pokemon" tableName="roles" columnNames="uuid" constraintName="uk_roles_uuid"/>
+    </changeSet>
+</databaseChangeLog>

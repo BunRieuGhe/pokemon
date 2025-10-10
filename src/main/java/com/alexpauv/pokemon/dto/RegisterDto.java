@@ -1,6 +1,6 @@
 package com.alexpauv.pokemon.dto;
 
-import com.alexpauv.pokemon.model.User;
+import com.alexpauv.pokemon.model.user.User;
 
 public class RegisterDto {
     private String username;

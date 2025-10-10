@@ -1,7 +1,11 @@
-package com.alexpauv.pokemon.model;
+package com.alexpauv.pokemon.model.user;
 
+import com.alexpauv.pokemon.model.role.Authority;
+import com.alexpauv.pokemon.model.role.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,6 +20,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
@@ -29,6 +34,9 @@ public class User implements Serializable {
     @Column(name="id")
     private Long id;
 
+    @Column(unique = true, nullable = false, updatable = false)
+    private UUID uuid;
+
     @Column(nullable = false, unique = true)
     private String username;
 
@@ -38,6 +46,9 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
+
     @Lob
     private byte[] image;
 
@@ -45,14 +56,16 @@ public class User implements Serializable {
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    public User() {}
+    public User() {
+        this.uuid = UUID.randomUUID();
+    }
 
-    public User(Long id, String username, String email, String password, byte[] image) {
-        this.id = id;
+    public User(String username, String email, String password, UserStatus status) {
+        super();
         this.username = username;
         this.email = email;
         this.password = password;
-        this.image = image;
+        this.status = status;
     }
 
     public Set<Authority> getAllAuthorities() {
@@ -65,6 +78,14 @@ public class User implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getUsername() {
@@ -89,6 +110,14 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     public byte[] getImage() {

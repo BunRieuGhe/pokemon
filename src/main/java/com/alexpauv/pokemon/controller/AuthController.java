@@ -4,7 +4,7 @@ import com.alexpauv.pokemon.dto.LoginDto;
 import com.alexpauv.pokemon.dto.LoginRequest;
 import com.alexpauv.pokemon.dto.RegisterDto;
 import com.alexpauv.pokemon.dto.RegisterRequest;
-import com.alexpauv.pokemon.service.UserService;
+import com.alexpauv.pokemon.service.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -1,7 +1,7 @@
 package com.alexpauv.pokemon.service;
 
 import com.alexpauv.pokemon.config.RsaKeyProperties;
-import com.alexpauv.pokemon.model.User;
+import com.alexpauv.pokemon.model.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.core.userdetails.UserDetails;

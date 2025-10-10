@@ -1,4 +1,4 @@
-package com.alexpauv.pokemon.model;
+package com.alexpauv.pokemon.model.role;
 
 public enum Authority {
     // User management

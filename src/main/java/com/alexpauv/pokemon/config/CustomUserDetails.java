@@ -1,6 +1,6 @@
 package com.alexpauv.pokemon.config;
 
-import com.alexpauv.pokemon.model.User;
+import com.alexpauv.pokemon.model.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
