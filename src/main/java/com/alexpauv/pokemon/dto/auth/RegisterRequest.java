@@ -1,4 +1,6 @@
-package com.alexpauv.pokemon.dto;
+package com.alexpauv.pokemon.dto.auth;
+
+import java.time.LocalDate;
 
 public class RegisterRequest {
     private String username;
@@ -6,6 +8,10 @@ public class RegisterRequest {
     private String email;
 
     private String password;
+
+    private String phoneNumber;
+
+    private LocalDate dateOfBirth;
 
     public String getUsername() {
         return username;
@@ -29,5 +35,21 @@ public class RegisterRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 }

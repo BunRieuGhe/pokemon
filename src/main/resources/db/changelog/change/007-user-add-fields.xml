@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="007-user-add-fields" author="alexpauv">
+        <addColumn schemaName="pokemon" tableName="users">
+            <column name="phone_number" type="text" />
+            <column name="date_of_birth" type="date" />
+            <column name="failed_login_attempts" type="int" defaultValueNumeric="0" />
+            <column name="lockout_time" type="timestamp" />
+            <column name="password_reset_token" type="text" />
+            <column name="password_reset_token_expiry_time" type="timestamp" />
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP" />
+            <column name="updated_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP" />
+        </addColumn>
+
+        <addColumn schemaName="pokemon" tableName="roles">
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP" />
+            <column name="updated_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP" />
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

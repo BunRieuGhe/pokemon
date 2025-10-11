@@ -2,5 +2,5 @@ package com.alexpauv.pokemon.model.user;
 
 public enum UserStatus {
     ACTIVE,
-    INACTIVE,
+    DEAD,
 }

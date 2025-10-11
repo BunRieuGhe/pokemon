@@ -1,5 +1,6 @@
 package com.alexpauv.pokemon.model.role;
 
+import com.alexpauv.pokemon.model.MonitoredEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -21,7 +22,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "roles")
-public class Role implements Serializable {
+public class Role extends MonitoredEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -47,7 +48,7 @@ public class Role implements Serializable {
     }
 
     public Role(String name, Set<Authority> authorities) {
-        super();
+        this();
         this.name = name;
         this.authorities = authorities;
     }

@@ -1,12 +1,15 @@
 package com.alexpauv.pokemon.service.user;
 
-import com.alexpauv.pokemon.dto.LoginDto;
-import com.alexpauv.pokemon.dto.LoginRequest;
-import com.alexpauv.pokemon.dto.RegisterDto;
-import com.alexpauv.pokemon.dto.RegisterRequest;
-import com.alexpauv.pokemon.exception.AuthenticationFailedException;
+import com.alexpauv.pokemon.dto.auth.LoginDto;
+import com.alexpauv.pokemon.dto.auth.LoginRequest;
+import com.alexpauv.pokemon.dto.auth.RegisterDto;
+import com.alexpauv.pokemon.dto.auth.RegisterRequest;
+import com.alexpauv.pokemon.dto.user.UserDto;
+import com.alexpauv.pokemon.exception.AccountDeadException;
+import com.alexpauv.pokemon.exception.CustomAccountLockedException;
+import com.alexpauv.pokemon.exception.CustomBadCredentialsException;
+import com.alexpauv.pokemon.exception.CustomUsernameNotFoundException;
 import com.alexpauv.pokemon.exception.EmailAlreadyExistsException;
-import com.alexpauv.pokemon.exception.MyUsernameNotFoundException;
 import com.alexpauv.pokemon.exception.UsernameAlreadyExistsException;
 import com.alexpauv.pokemon.model.user.User;
 import com.alexpauv.pokemon.model.user.UserStatus;
@@ -14,9 +17,11 @@ import com.alexpauv.pokemon.repository.user.UserRepository;
 import com.alexpauv.pokemon.service.JwtService;
 import com.alexpauv.pokemon.service.role.RoleService;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -51,18 +56,24 @@ public class UserService {
         }
     }
 
+    private User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new CustomUsernameNotFoundException("Username not found: " + username));
+    }
+
     public RegisterDto registerUser(RegisterRequest registerRequest) {
         if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
-            throw new UsernameAlreadyExistsException("Username already exists");
+            throw new UsernameAlreadyExistsException("Username already exists: " + registerRequest.getUsername());
         }
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
-            throw new EmailAlreadyExistsException("Email already exists");
+            throw new EmailAlreadyExistsException("Email already exists: " + registerRequest.getEmail());
         }
 
         User user = new User();
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setPhoneNumber(registerRequest.getPhoneNumber());
+        user.setDateOfBirth(registerRequest.getDateOfBirth());
         user.setStatus(UserStatus.ACTIVE);
         user.setRoles(Set.of(roleService.getDefaultRole()));
 
@@ -78,19 +89,20 @@ public class UserService {
             if (authentication.isAuthenticated()) {
                 User user = getUserByUsername(loginRequest.getUsername());
                 String token = jwtService.generateToken(user);
-                return new LoginDto(user.getUsername(), token);
+                return new LoginDto(user.getUuid(), user.getUsername(), token);
             }
-        } catch (AuthenticationException e) {
-            throw new AuthenticationFailedException("Authentication failed");
+        } catch (BadCredentialsException e) {
+            throw new CustomBadCredentialsException("Wrong credentials bozo");
+        } catch (LockedException e) {
+            throw new CustomAccountLockedException("Account is currently locked");
+        } catch (DisabledException e) {
+            throw new AccountDeadException("Account is dead, logging in with this account is prohibited");
         }
         return new LoginDto();
     }
 
-    public List<User> getUsers() {
-        return userRepository.findAll();
-    }
-
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new MyUsernameNotFoundException("Username not found: " + username));
+    public List<UserDto> getUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(UserDto::new).toList();
     }
 }

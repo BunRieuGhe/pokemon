@@ -1,6 +1,6 @@
 package com.alexpauv.pokemon.config;
 
-import com.alexpauv.pokemon.exception.MyUsernameNotFoundException;
+import com.alexpauv.pokemon.exception.CustomUsernameNotFoundException;
 import com.alexpauv.pokemon.model.user.User;
 import com.alexpauv.pokemon.repository.user.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new MyUsernameNotFoundException("User not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new CustomUsernameNotFoundException("User not found: " + username));
         return new CustomUserDetails(user);
     }
 }

@@ -1,4 +1,4 @@
-package com.alexpauv.pokemon.dto;
+package com.alexpauv.pokemon.dto.auth;
 
 public class LoginRequest {
     private String username;

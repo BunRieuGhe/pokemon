@@ -1,6 +1,6 @@
 package com.alexpauv.pokemon.config;
 
-import com.alexpauv.pokemon.exception.MyUsernameNotFoundException;
+import com.alexpauv.pokemon.exception.CustomUsernameNotFoundException;
 import com.alexpauv.pokemon.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -51,7 +51,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 }
             }
         } catch (UsernameNotFoundException e) {
-            throw new MyUsernameNotFoundException("Username not found");
+            throw new CustomUsernameNotFoundException("Username not found: " + username);
         }
 
         filterChain.doFilter(request, response);

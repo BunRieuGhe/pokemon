@@ -1,6 +1,6 @@
 package com.alexpauv.pokemon.exception;
 
-import com.alexpauv.pokemon.dto.ErrorDTO;
+import com.alexpauv.pokemon.dto.error.ErrorDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,28 +8,43 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(MyUsernameNotFoundException.class)
-    public ResponseEntity<ErrorDTO> handleUsernameNotFound(MyUsernameNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDTO(ErrorCode.USERNAME_NOT_FOUND));
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorDto> handleGenericException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorDto(ErrorCode.INTERNAL_ERROR, e.getMessage()));
+    }
+
+    @ExceptionHandler(CustomBadCredentialsException.class)
+    public ResponseEntity<ErrorDto> handleBadCredentials(CustomBadCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDto(ErrorCode.BAD_CREDENTIALS, e.getMessage()));
+    }
+
+    @ExceptionHandler(CustomAccountLockedException.class)
+    public ResponseEntity<ErrorDto> handleAccountLocked(CustomAccountLockedException e) {
+        return ResponseEntity.status(HttpStatus.LOCKED).body(new ErrorDto(ErrorCode.ACCOUNT_LOCKED, e.getMessage()));
+    }
+
+    @ExceptionHandler(AccountDeadException.class)
+    public ResponseEntity<ErrorDto> handleAccountDead(AccountDeadException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorDto(ErrorCode.ACCOUNT_DEAD, e.getMessage()));
+    }
+
+    @ExceptionHandler(CustomUsernameNotFoundException.class)
+    public ResponseEntity<ErrorDto> handleUsernameNotFound(CustomUsernameNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDto(ErrorCode.USERNAME_NOT_FOUND, e.getMessage()));
     }
 
     @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public ResponseEntity<ErrorDTO> handleUsernameAlreadyExists(UsernameAlreadyExistsException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDTO(ErrorCode.USERNAME_ALREADY_EXISTS));
+    public ResponseEntity<ErrorDto> handleUsernameAlreadyExists(UsernameAlreadyExistsException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDto(ErrorCode.USERNAME_ALREADY_EXISTS, e.getMessage()));
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<ErrorDTO> handleEmailAlreadyExists(EmailAlreadyExistsException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDTO(ErrorCode.EMAIL_ALREADY_EXISTS));
-    }
-
-    @ExceptionHandler(AuthenticationFailedException.class)
-    public ResponseEntity<ErrorDTO> handleAuthenticationFailed(AuthenticationFailedException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDTO(ErrorCode.AUTHENTICATION_FAILED));
+    public ResponseEntity<ErrorDto> handleEmailAlreadyExists(EmailAlreadyExistsException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDto(ErrorCode.EMAIL_ALREADY_EXISTS, e.getMessage()));
     }
 
     @ExceptionHandler(RoleNotFoundException.class)
-    public ResponseEntity<ErrorDTO> handleRoleNotFound(RoleNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO(ErrorCode.ROLE_NOT_FOUND));
+    public ResponseEntity<ErrorDto> handleRoleNotFound(RoleNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(ErrorCode.ROLE_NOT_FOUND, e.getMessage()));
     }
 }
