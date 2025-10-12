@@ -1,4 +1,4 @@
-package com.alexpauv.pokemon.service.login;
+package com.alexpauv.pokemon.service.auth;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;

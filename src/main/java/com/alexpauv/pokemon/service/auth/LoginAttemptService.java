@@ -1,4 +1,4 @@
-package com.alexpauv.pokemon.service.login;
+package com.alexpauv.pokemon.service.auth;
 
 import com.alexpauv.pokemon.repository.user.UserRepository;
 import org.springframework.stereotype.Service;
@@ -6,12 +6,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LoginAttemptService {
-    private final LoginProperties loginProperties;
+    private final SecurityProperties securityProperties;
 
     private final UserRepository userRepository;
 
-    public LoginAttemptService(LoginProperties loginProperties, UserRepository userRepository) {
-        this.loginProperties = loginProperties;
+    public LoginAttemptService(SecurityProperties securityProperties, UserRepository userRepository) {
+        this.securityProperties = securityProperties;
         this.userRepository = userRepository;
     }
 
@@ -30,8 +30,8 @@ public class LoginAttemptService {
         userRepository.findByUsername(username).ifPresent(user -> {
             user.incrementFailedAttempts();
 
-            if (user.getFailedLoginAttempts() >= loginProperties.maxLoginAttempts()) {
-                user.lockAccount(loginProperties.lockDurationMinutes());
+            if (user.getFailedLoginAttempts() >= securityProperties.maxLoginAttempts()) {
+                user.lockAccount(securityProperties.lockDurationMinutes());
             }
 
             userRepository.save(user);

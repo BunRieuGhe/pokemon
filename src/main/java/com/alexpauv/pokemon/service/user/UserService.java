@@ -2,6 +2,9 @@ package com.alexpauv.pokemon.service.user;
 
 import com.alexpauv.pokemon.dto.auth.LoginDto;
 import com.alexpauv.pokemon.dto.auth.LoginRequest;
+import com.alexpauv.pokemon.dto.auth.PasswordResetConfirmationRequest;
+import com.alexpauv.pokemon.dto.auth.PasswordResetDto;
+import com.alexpauv.pokemon.dto.auth.PasswordResetInquiryRequest;
 import com.alexpauv.pokemon.dto.auth.RegisterDto;
 import com.alexpauv.pokemon.dto.auth.RegisterRequest;
 import com.alexpauv.pokemon.dto.user.UserDto;
@@ -15,6 +18,7 @@ import com.alexpauv.pokemon.model.user.User;
 import com.alexpauv.pokemon.model.user.UserStatus;
 import com.alexpauv.pokemon.repository.user.UserRepository;
 import com.alexpauv.pokemon.service.JwtService;
+import com.alexpauv.pokemon.service.auth.PasswordResetService;
 import com.alexpauv.pokemon.service.role.RoleService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +29,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -32,16 +37,23 @@ import java.util.Set;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
+
     private final AuthenticationManager authenticationManager;
+
     private final JwtService jwtService;
+
+    private final PasswordResetService passwordResetService;
+
     private final RoleService roleService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService, RoleService roleService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService, PasswordResetService passwordResetService, RoleService roleService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.passwordResetService = passwordResetService;
         this.roleService = roleService;
     }
 
@@ -60,6 +72,7 @@ public class UserService {
         return userRepository.findByUsername(username).orElseThrow(() -> new CustomUsernameNotFoundException("Username not found: " + username));
     }
 
+    @Transactional
     public RegisterDto registerUser(RegisterRequest registerRequest) {
         if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
             throw new UsernameAlreadyExistsException("Username already exists: " + registerRequest.getUsername());
@@ -99,6 +112,14 @@ public class UserService {
             throw new AccountDeadException("Account is dead, logging in with this account is prohibited");
         }
         return new LoginDto();
+    }
+
+    public PasswordResetDto requestPasswordReset(PasswordResetInquiryRequest request) {
+        return passwordResetService.requestPasswordReset(request);
+    }
+
+    public PasswordResetDto resetPassword(PasswordResetConfirmationRequest request) {
+        return passwordResetService.resetPassword(request);
     }
 
     public List<UserDto> getUsers() {

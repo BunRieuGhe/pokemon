@@ -2,6 +2,9 @@ package com.alexpauv.pokemon.controller;
 
 import com.alexpauv.pokemon.dto.auth.LoginDto;
 import com.alexpauv.pokemon.dto.auth.LoginRequest;
+import com.alexpauv.pokemon.dto.auth.PasswordResetConfirmationRequest;
+import com.alexpauv.pokemon.dto.auth.PasswordResetDto;
+import com.alexpauv.pokemon.dto.auth.PasswordResetInquiryRequest;
 import com.alexpauv.pokemon.dto.auth.RegisterDto;
 import com.alexpauv.pokemon.dto.auth.RegisterRequest;
 import com.alexpauv.pokemon.service.user.UserService;
@@ -28,5 +31,15 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginDto> login(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(userService.loginUser(loginRequest));
+    }
+
+    @PostMapping("/password-reset/request")
+    public ResponseEntity<PasswordResetDto> requestPasswordReset(@RequestBody PasswordResetInquiryRequest request) {
+        return ResponseEntity.ok(userService.requestPasswordReset(request));
+    }
+
+    @PostMapping("/password-reset/confirm")
+    public ResponseEntity<PasswordResetDto> resetPassword(@RequestBody PasswordResetConfirmationRequest request) {
+        return ResponseEntity.ok(userService.resetPassword(request));
     }
 }

@@ -28,6 +28,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorDto(ErrorCode.ACCOUNT_DEAD, e.getMessage()));
     }
 
+    @ExceptionHandler(PasswordResetEmailSendingFailureException.class)
+    public ResponseEntity<ErrorDto> handlePasswordResetEmailSendingFailure(PasswordResetEmailSendingFailureException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorDto(ErrorCode.PASSWORD_RESET_EMAIL_SENDING_FAILURE, e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    public ResponseEntity<ErrorDto> handleInvalidPasswordResetToken(InvalidPasswordResetTokenException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(ErrorCode.INVALID_PASSWORD_RESET_TOKEN, e.getMessage()));
+    }
+
+    @ExceptionHandler(WeakPasswordException.class)
+    public ResponseEntity<ErrorDto> handleWeakPassword(WeakPasswordException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(ErrorCode.WEAK_PASSWORD, e.getMessage()));
+    }
+
     @ExceptionHandler(CustomUsernameNotFoundException.class)
     public ResponseEntity<ErrorDto> handleUsernameNotFound(CustomUsernameNotFoundException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDto(ErrorCode.USERNAME_NOT_FOUND, e.getMessage()));
@@ -41,6 +56,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ErrorDto> handleEmailAlreadyExists(EmailAlreadyExistsException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDto(ErrorCode.EMAIL_ALREADY_EXISTS, e.getMessage()));
+    }
+
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<ErrorDto> handleEmailNotFound(EmailNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDto(ErrorCode.EMAIL_NOT_FOUND, e.getMessage()));
     }
 
     @ExceptionHandler(RoleNotFoundException.class)

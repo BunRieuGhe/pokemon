@@ -113,6 +113,18 @@ public class User extends MonitoredEntity implements Serializable {
         lockoutTime = null;
     }
 
+    public boolean isPasswordResetTokenValid() {
+        if (passwordResetToken == null || passwordResetTokenExpiryTime == null) {
+            return false;
+        }
+        return LocalDateTime.now().isBefore(passwordResetTokenExpiryTime);
+    }
+
+    public void clearPasswordResetToken() {
+        passwordResetToken = null;
+        passwordResetTokenExpiryTime = null;
+    }
+
     public Long getId() {
         return id;
     }
