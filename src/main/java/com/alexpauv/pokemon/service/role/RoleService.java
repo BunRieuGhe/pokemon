@@ -3,9 +3,9 @@ package com.alexpauv.pokemon.service.role;
 import com.alexpauv.pokemon.exception.RoleNotFoundException;
 import com.alexpauv.pokemon.model.role.Role;
 import com.alexpauv.pokemon.repository.role.RoleRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class RoleService {
@@ -28,5 +28,9 @@ public class RoleService {
 
     public Role getRoleByName(String name) {
         return roleRepository.findByName(name).orElseThrow(() -> new RoleNotFoundException("Role not found: " + name));
+    }
+
+    public Role getRoleByUuid(String uuid) {
+        return roleRepository.findByUuid(UUID.fromString(uuid)).orElseThrow(() -> new RoleNotFoundException("Role not found: " + uuid));
     }
 }

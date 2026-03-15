@@ -7,6 +7,7 @@ import com.alexpauv.pokemon.dto.auth.PasswordResetDto;
 import com.alexpauv.pokemon.dto.auth.PasswordResetInquiryRequest;
 import com.alexpauv.pokemon.dto.auth.RegisterDto;
 import com.alexpauv.pokemon.dto.auth.RegisterRequest;
+import com.alexpauv.pokemon.dto.user.UserAddOrRemoveRoleRequest;
 import com.alexpauv.pokemon.dto.user.UserDto;
 import com.alexpauv.pokemon.exception.AccountDeadException;
 import com.alexpauv.pokemon.exception.CustomAccountLockedException;
@@ -14,7 +15,9 @@ import com.alexpauv.pokemon.exception.CustomBadCredentialsException;
 import com.alexpauv.pokemon.exception.CustomUsernameNotFoundException;
 import com.alexpauv.pokemon.exception.EmailAlreadyExistsException;
 import com.alexpauv.pokemon.exception.UsernameAlreadyExistsException;
+import com.alexpauv.pokemon.model.role.Role;
 import com.alexpauv.pokemon.model.user.User;
+import com.alexpauv.pokemon.model.user.UserRoleChangeType;
 import com.alexpauv.pokemon.model.user.UserStatus;
 import com.alexpauv.pokemon.repository.user.UserRepository;
 import com.alexpauv.pokemon.service.JwtService;
@@ -33,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -70,6 +74,10 @@ public class UserService {
 
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new CustomUsernameNotFoundException("Username not found: " + username));
+    }
+
+    private User getUserByUuid(String uuid) {
+        return userRepository.findByUuid(UUID.fromString(uuid)).orElseThrow(() -> new CustomUsernameNotFoundException("User not found: " + uuid));
     }
 
     @Transactional
@@ -125,5 +133,18 @@ public class UserService {
     public List<UserDto> getUsers() {
         List<User> users = userRepository.findAll();
         return users.stream().map(UserDto::new).toList();
+    }
+
+    public void addOrRemoveUserRole(String userUuid, UserAddOrRemoveRoleRequest request) {
+        User user = getUserByUuid(userUuid);
+        Role role = roleService.getRoleByUuid(request.getRoleUuid());
+
+        if (UserRoleChangeType.ADD.equals(request.getChangeType())) {
+            user.getRoles().add(role);
+        } else {
+            user.getRoles().remove(role);
+        }
+
+        userRepository.save(user);
     }
 }
